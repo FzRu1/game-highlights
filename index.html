@@ -508,9 +508,10 @@ function createCard(video) {
     <article class="card" data-tag="${video.tag}">
       <div class="card__video">
         <iframe
-          src="https://player.bilibili.com/player.html?bvid=${video.bvid}&p=${video.p || 1}&high_quality=1&autoplay=0"
+          src="//player.bilibili.com/player.html?bvid=${video.bvid}&p=${video.p || 1}&high_quality=1&autoplay=0&danmaku=0"
           allowfullscreen
-          sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts allow-popups"
+          scrolling="no"
+          frameborder="0"
           loading="lazy"
         ></iframe>
       </div>

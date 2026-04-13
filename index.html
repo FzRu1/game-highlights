@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Highlights Collection</title>
+<style>
+  /* ========== Reset & Base ========== */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-card: #12121a;
+    --bg-card-hover: #1a1a28;
+    --accent: #00f0ff;
+    --accent-alt: #b14aff;
+    --accent-glow: rgba(0, 240, 255, 0.15);
+    --text-primary: #e8e8f0;
+    --text-secondary: #8888a0;
+    --text-date: #6a6a80;
+    --border: #1e1e30;
+    --radius: 12px;
+    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== Animated Background ========== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 240, 255, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(177, 74, 255, 0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ========== Scanline Overlay ========== */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ========== Header ========== */
+  .header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 40px;
+  }
+
+  .header__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .header__title {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    text-shadow: 0 0 40px var(--accent-glow);
+  }
+
+  .header__subtitle {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--text-secondary);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .header__line {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-alt), transparent);
+    margin: 24px auto 0;
+    border: none;
+  }
+
+  /* ========== Stats Bar ========== */
+  .stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 0 20px 40px;
+    flex-wrap: wrap;
+  }
+
+  .stats__item {
+    text-align: center;
+  }
+
+  .stats__number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stats__label {
+    font-size: 0.75rem;
+    color: var(--text-date);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* ========== Filter Tabs ========== */
+  .filters {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 20px 40px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 8px 20px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    letter-spacing: 1px;
+    font-family: inherit;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+  }
+
+  .filter-btn.active {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(177, 74, 255, 0.15));
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+  }
+
+  /* ========== Video Grid ========== */
+  .grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+    padding: 0 40px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ========== Video Card ========== */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+    animation: fadeInUp 0.6s ease-out both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-alt));
+    opacity: 0;
+    transition: var(--transition);
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    background: var(--bg-card-hover);
+    border-color: rgba(0, 240, 255, 0.2);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 60px rgba(0, 240, 255, 0.05);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Stagger animation */
+  .card:nth-child(1)  { animation-delay: 0.05s; }
+  .card:nth-child(2)  { animation-delay: 0.10s; }
+  .card:nth-child(3)  { animation-delay: 0.15s; }
+  .card:nth-child(4)  { animation-delay: 0.20s; }
+  .card:nth-child(5)  { animation-delay: 0.25s; }
+  .card:nth-child(6)  { animation-delay: 0.30s; }
+  .card:nth-child(7)  { animation-delay: 0.35s; }
+  .card:nth-child(8)  { animation-delay: 0.40s; }
+  .card:nth-child(9)  { animation-delay: 0.45s; }
+
+  /* ========== Video Embed ========== */
+  .card__video {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 */
+    background: #000;
+  }
+
+  .card__video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* ========== Card Body ========== */
+  .card__body {
+    padding: 16px 20px 20px;
+  }
+
+  .card__tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  .card__tag--fps     { background: rgba(0, 240, 255, 0.12); color: var(--accent); }
+  .card__tag--moba    { background: rgba(177, 74, 255, 0.12); color: var(--accent-alt); }
+  .card__tag--rpg     { background: rgba(255, 170, 0, 0.12);  color: #ffaa00; }
+  .card__tag--br      { background: rgba(255, 60, 100, 0.12); color: #ff3c64; }
+  .card__tag--racing  { background: rgba(0, 230, 118, 0.12);  color: #00e676; }
+  .card__tag--retro   { background: rgba(255, 215, 0, 0.12);  color: #ffd700; }
+
+  .card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card__date {
+    font-size: 0.78rem;
+    color: var(--text-date);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card__date::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  .card__duration {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  /* ========== Empty State ========== */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-secondary);
+  }
+
+  .empty-state__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-state__text {
+    font-size: 1.1rem;
+  }
+
+  /* ========== Footer ========== */
+  .footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 60px;
+    border-top: 1px solid var(--border);
+    color: var(--text-date);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition);
+  }
+
+  .footer a:hover {
+    text-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  /* ========== Scrollbar ========== */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.3);
+  }
+
+  /* ========== Responsive ========== */
+  @media (max-width: 768px) {
+    .header {
+      padding: 40px 16px 28px;
+    }
+
+    .header__icon {
+      font-size: 36px;
+    }
+
+    .stats {
+      gap: 24px;
+      padding-bottom: 28px;
+    }
+
+    .filters {
+      padding: 0 16px 28px;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      font-size: 0.78rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 0 16px 60px;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+      padding: 0 24px 80px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <span class="header__icon">🎮</span>
+    <h1 class="header__title">Game Highlights</h1>
+    <p class="header__subtitle">Epic Moments Collection</p>
+    <hr class="header__line">
+  </header>
+
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- Filter Tabs -->
+  <nav class="filters" id="filters"></nav>
+
+  <!-- Video Grid -->
+  <main class="grid" id="videoGrid"></main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>GAME HIGHLIGHTS &copy; 2026 &mdash; Built with ☕ and 🎮</p>
+  </footer>
+
+<script>
+// ============================================================
+//  VIDEO DATA — 在这里增删改你的视频
+//  id: YouTube视频ID（网址 v= 后面那串）
+//  title: 视频标题
+//  date: 日期（YYYY-MM-DD）
+//  tag: 分类标签（fps / moba / rpg / br / racing / retro）
+//  duration: 时长（可选）
+// ============================================================
+const VIDEOS = [
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'CS2 - 死亡竞赛 1v5 极限翻盘',
+    date: '2026-04-10',
+    tag: 'fps',
+    duration: '12:34'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'League of Legends - 亚索五杀时刻',
+    date: '2026-04-08',
+    tag: 'moba',
+    duration: '08:21'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'Elden Ring - 无伤击败 Malenia',
+    date: '2026-04-05',
+    tag: 'rpg',
+    duration: '15:47'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'Apex Legends - 20杀吃鸡最速通关',
+    date: '2026-03-30',
+    tag: 'br',
+    duration: '18:03'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'Valorant - Jett 四连狙封神局',
+    date: '2026-03-25',
+    tag: 'fps',
+    duration: '10:55'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'DOTA2 - 基地5%血量史诗翻盘',
+    date: '2026-03-20',
+    tag: 'moba',
+    duration: '22:18'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: 'Forza Horizon 5 - 飘逸过弯合集',
+    date: '2026-03-15',
+    tag: 'racing',
+    duration: '06:42'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: '塞尔达传说 - 物理引擎骚操作',
+    date: '2026-03-10',
+    tag: 'rpg',
+    duration: '09:33'
+  },
+  {
+    id: 'dQw4w9WgXcQ',
+    title: '经典街机回忆 - 拳皇97 无限连招',
+    date: '2026-03-05',
+    tag: 'retro',
+    duration: '07:15'
+  }
+];
+
+// ============================================================
+//  TAG CONFIG
+// ============================================================
+const TAG_CONFIG = {
+  fps:    { label: 'FPS',    class: 'card__tag--fps' },
+  moba:   { label: 'MOBA',   class: 'card__tag--moba' },
+  rpg:    { label: 'RPG',    class: 'card__tag--rpg' },
+  br:     { label: 'BR',     class: 'card__tag--br' },
+  racing: { label: 'RACING', class: 'card__tag--racing' },
+  retro:  { label: 'RETRO',  class: 'card__tag--retro' }
+};
+
+// ============================================================
+//  RENDER FUNCTIONS
+// ============================================================
+
+/** Format date to readable string */
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+/** Build a single video card */
+function createCard(video) {
+  const tag = TAG_CONFIG[video.tag] || { label: video.tag.toUpperCase(), class: '' };
+
+  return `
+    <article class="card" data-tag="${video.tag}">
+      <div class="card__video">
+        <iframe
+          src="https://www.youtube.com/embed/${video.id}"
+          title="${video.title}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          loading="lazy"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div class="card__body">
+        <span class="card__tag ${tag.class}">${tag.label}</span>
+        <h2 class="card__title">${video.title}</h2>
+        <div class="card__meta">
+          <time class="card__date" datetime="${video.date}">${formatDate(video.date)}</time>
+          ${video.duration ? `<span class="card__duration">${video.duration}</span>` : ''}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+/** Render stats bar */
+function renderStats(videos) {
+  const tags = [...new Set(videos.map(v => v.tag))];
+  document.getElementById('stats').innerHTML = `
+    <div class="stats__item">
+      <div class="stats__number">${videos.length}</div>
+      <div class="stats__label">Videos</div>
+    </div>
+    <div class="stats__item">
+      <div class="stats__number">${tags.length}</div>
+      <div class="stats__label">Categories</div>
+    </div>
+    <div class="stats__item">
+      <div class="stats__number">${new Date().getFullYear()}</div>
+      <div class="stats__label">Season</div>
+    </div>
+  `;
+}
+
+/** Render filter buttons */
+function renderFilters(videos) {
+  const tags = [...new Set(videos.map(v => v.tag))];
+  const filtersHTML = [
+    `<button class="filter-btn active" data-filter="all">ALL</button>`,
+    ...tags.map(t => {
+      const cfg = TAG_CONFIG[t] || { label: t.toUpperCase() };
+      return `<button class="filter-btn" data-filter="${t}">${cfg.label}</button>`;
+    })
+  ].join('');
+
+  document.getElementById('filters').innerHTML = filtersHTML;
+}
+
+/** Render video grid */
+function renderGrid(videos) {
+  const grid = document.getElementById('videoGrid');
+
+  if (videos.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state__icon">🎮</div>
+        <p class="empty-state__text">No videos here yet — go make some highlights!</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = videos.map(createCard).join('');
+}
+
+// ============================================================
+//  FILTER LOGIC
+// ============================================================
+function setupFilters() {
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+
+    // Update active state
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const filter = btn.dataset.filter;
+    const filtered = filter === 'all'
+      ? VIDEOS
+      : VIDEOS.filter(v => v.tag === filter);
+
+    renderGrid(filtered);
+  });
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  renderStats(VIDEOS);
+  renderFilters(VIDEOS);
+  renderGrid(VIDEOS);
+  setupFilters();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

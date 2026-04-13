@@ -250,19 +250,18 @@
   .card:nth-child(8)  { animation-delay: 0.40s; }
   .card:nth-child(9)  { animation-delay: 0.45s; }
 
-  /* ========== Video Embed ========== */
+  /* ========== Video Player ========== */
   .card__video {
     position: relative;
-    padding-top: 56.25%; /* 16:9 */
     background: #000;
   }
 
-  .card__video iframe {
-    position: absolute;
-    inset: 0;
+  .card__video video {
+    display: block;
     width: 100%;
-    height: 100%;
-    border: none;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    background: #000;
   }
 
   /* ========== Card Body ========== */
@@ -457,7 +456,7 @@
 <script>
 // ============================================================
 //  VIDEO DATA — 在这里增删改你的视频
-//  id: YouTube视频ID（网址 v= 后面那串）
+//  url: 视频直链（GitHub Release 下载链接）
 //  title: 视频标题
 //  date: 日期（YYYY-MM-DD）
 //  tag: 分类标签（fps / moba / rpg / br / racing / retro）
@@ -465,8 +464,8 @@
 // ============================================================
 const VIDEOS = [
   {
-    id: 'tibN4tjDe7g',
-    title: '游戏集锦 #1',
+    url: 'https://github.com/laoduck/game-highlights/releases/download/v1.0/_1.mp4',
+    title: '完美操作 #1',
     date: '2026-04-13',
     tag: 'fps',
     duration: ''
@@ -506,13 +505,13 @@ function createCard(video) {
   return `
     <article class="card" data-tag="${video.tag}">
       <div class="card__video">
-        <iframe
-          src="https://www.youtube.com/embed/${video.id}"
-          title="${video.title}"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          loading="lazy"
-          allowfullscreen
-        ></iframe>
+        <video
+          src="${video.url}"
+          controls
+          preload="metadata"
+          playsinline
+          poster=""
+        ></video>
       </div>
       <div class="card__body">
         <span class="card__tag ${tag.class}">${tag.label}</span>

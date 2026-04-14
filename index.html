@@ -133,6 +133,9 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(180deg,
 .showcase__player.active{opacity:1;pointer-events:auto;animation:playerReveal .55s var(--ease-expo) both}
 .showcase__player.dismissing{animation:playerDismiss .4s var(--ease-expo) forwards;pointer-events:none}
 .showcase__player video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
+body.cinema-mode .showcase__media{aspect-ratio:auto;height:100%}
+body.cinema-mode .showcase::after{display:none}
+body.cinema-mode .showcase__player video{max-height:100vh}
 .loading-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.6);z-index:6;pointer-events:none}
 .loading-hint__spinner{width:28px;height:28px;border:2px solid rgba(240,165,0,.15);border-top-color:var(--accent-1);border-radius:50%;animation:loadingSpin .8s linear infinite}
 .loading-hint__text{font-family:"Rajdhani",var(--font-mono);font-size:12px;font-weight:600;color:rgba(240,165,0,.5);letter-spacing:4px;text-transform:uppercase}
@@ -177,11 +180,11 @@ body.cinema-mode .filmstrip{opacity:0!important;transform:translateY(100%);point
 body.cinema-mode .plaque{opacity:0!important;pointer-events:none}
 body.cinema-mode .nav-arrow{opacity:0!important;pointer-events:none}
 body.cinema-mode .page-indicator,body.cinema-mode .mobile-nav{opacity:0!important;pointer-events:none}
-body.cinema-mode .showcase{width:94vw}
+body.cinema-mode .showcase{width:94vw;max-height:100vh}
 body.cinema-mode .showcase::before{opacity:0}
 body.cinema-mode .showcase::after{opacity:0}
 body.cinema-mode .corner-accents{opacity:0}
-body.cinema-mode .stage{padding:0}
+body.cinema-mode .stage{padding:0;height:100vh}
 
 /* Plaque */
 .plaque{margin-top:18px;text-align:center;will-change:transform,opacity;transition:opacity .3s}
@@ -337,27 +340,41 @@ const sfx={
   ctx:null,muted:true,
   unlock(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)()},
   toggle(){this.unlock();this.muted=!this.muted;return!this.muted},
-  tone(freq,dur,type='sine',vol=.12){
+  tone(freq,dur,type='sine',vol=.06){
     if(this.muted||!this.ctx)return;
-    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain(),f=this.ctx.createBiquadFilter();
     o.type=type;o.frequency.value=freq;
-    g.gain.setValueAtTime(vol,this.ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+dur);
-    o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+dur);
+    f.type='lowpass';f.frequency.value=Math.min(freq*1.5,2000);f.Q.value=.7;
+    g.gain.setValueAtTime(0,this.ctx.currentTime);
+    g.gain.linearRampToValueAtTime(vol,this.ctx.currentTime+.008);
+    g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+dur);
+    o.connect(f);f.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+dur);
   },
-  tick(){this.tone(1200,.04,'square',.05)},
-  whoosh(){this.tone(400,.18,'sawtooth',.07);setTimeout(()=>this.tone(200,.12,'sawtooth',.04),40)},
-  click(){this.tone(800,.05,'sine',.08);this.tone(1600,.03,'sine',.04)},
+  tick(){this.tone(520,.08,'sine',.03)},
+  whoosh(){
+    if(this.muted||!this.ctx)return;
+    const n=this.ctx.createBuffer(1,this.ctx.sampleRate*.25,this.ctx.sampleRate);
+    const d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    const s=this.ctx.createBufferSource(),g=this.ctx.createGain(),f=this.ctx.createBiquadFilter();
+    s.buffer=n;f.type='bandpass';f.frequency.value=300;f.Q.value=.5;
+    g.gain.setValueAtTime(0,this.ctx.currentTime);
+    g.gain.linearRampToValueAtTime(.025,this.ctx.currentTime+.03);
+    g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+.22);
+    s.connect(f);f.connect(g);g.connect(this.ctx.destination);s.start();
+  },
+  click(){this.tone(440,.12,'sine',.04);setTimeout(()=>this.tone(660,.06,'sine',.02),15)},
   glitchSfx(){
     if(this.muted||!this.ctx)return;
-    const n=this.ctx.createBuffer(1,this.ctx.sampleRate*.06,this.ctx.sampleRate);
-    const d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
-    const s=this.ctx.createBufferSource(),g=this.ctx.createGain();
-    s.buffer=n;g.gain.setValueAtTime(.04,this.ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+.06);
-    s.connect(g);g.connect(this.ctx.destination);s.start();
+    const n=this.ctx.createBuffer(1,this.ctx.sampleRate*.04,this.ctx.sampleRate);
+    const d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.5;
+    const s=this.ctx.createBufferSource(),g=this.ctx.createGain(),f=this.ctx.createBiquadFilter();
+    s.buffer=n;f.type='lowpass';f.frequency.value=800;f.Q.value=.5;
+    g.gain.setValueAtTime(0,this.ctx.currentTime);
+    g.gain.linearRampToValueAtTime(.02,this.ctx.currentTime+.005);
+    g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+.04);
+    s.connect(f);f.connect(g);g.connect(this.ctx.destination);s.start();
   },
-  boot(){this.tone(440,.08,'square',.03)}
+  boot(){this.tone(330,.15,'sine',.025);setTimeout(()=>this.tone(440,.12,'sine',.018),80)}
 };
 
 soundToggle.addEventListener('click',()=>{

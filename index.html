@@ -133,9 +133,8 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(180deg,
 .showcase__player.active{opacity:1;pointer-events:auto;animation:playerReveal .55s var(--ease-expo) both}
 .showcase__player.dismissing{animation:playerDismiss .4s var(--ease-expo) forwards;pointer-events:none}
 .showcase__player video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
-body.cinema-mode .showcase__media{aspect-ratio:auto;height:100%}
-body.cinema-mode .showcase::after{display:none}
-body.cinema-mode .showcase__player video{max-height:100vh}
+body.cinema-mode .showcase__media{aspect-ratio:auto;width:100%;height:100%}
+body.cinema-mode .showcase__player video{width:100%;height:100%;object-fit:contain}
 .loading-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.6);z-index:6;pointer-events:none}
 .loading-hint__spinner{width:28px;height:28px;border:2px solid rgba(240,165,0,.15);border-top-color:var(--accent-1);border-radius:50%;animation:loadingSpin .8s linear infinite}
 .loading-hint__text{font-family:"Rajdhani",var(--font-mono);font-size:12px;font-weight:600;color:rgba(240,165,0,.5);letter-spacing:4px;text-transform:uppercase}
@@ -175,16 +174,16 @@ body.cinema-mode .showcase__player video{max-height:100vh}
 
 /* Cinema Mode */
 body.cinema-mode{background:#050508}
-body.cinema-mode .topbar{opacity:0;transform:translateY(-100%);pointer-events:none}
-body.cinema-mode .filmstrip{opacity:0!important;transform:translateY(100%);pointer-events:none}
-body.cinema-mode .plaque{opacity:0!important;pointer-events:none}
+body.cinema-mode .topbar{opacity:0;pointer-events:none;position:fixed;top:0;left:0;right:0;z-index:-1;height:0;padding:0;border:0;overflow:hidden}
+body.cinema-mode .filmstrip{opacity:0!important;pointer-events:none;position:fixed;bottom:0;left:0;right:0;z-index:-1;height:0!important;padding:0!important;border:0!important;overflow:hidden}
+body.cinema-mode .plaque{opacity:0!important;pointer-events:none;height:0;margin:0;overflow:hidden}
 body.cinema-mode .nav-arrow{opacity:0!important;pointer-events:none}
-body.cinema-mode .page-indicator,body.cinema-mode .mobile-nav{opacity:0!important;pointer-events:none}
-body.cinema-mode .showcase{width:94vw;max-height:100vh}
+body.cinema-mode .page-indicator,body.cinema-mode .mobile-nav{opacity:0!important;pointer-events:none;height:0;padding:0;overflow:hidden}
+body.cinema-mode .stage{padding:0}
+body.cinema-mode .showcase{width:100%;height:100%}
 body.cinema-mode .showcase::before{opacity:0}
 body.cinema-mode .showcase::after{opacity:0}
 body.cinema-mode .corner-accents{opacity:0}
-body.cinema-mode .stage{padding:0;height:100vh}
 
 /* Plaque */
 .plaque{margin-top:18px;text-align:center;will-change:transform,opacity;transition:opacity .3s}

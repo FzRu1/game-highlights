@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CS Highlights</title>
+<meta name="description" content="CS2 Game Highlights Collection">
+<meta property="og:title" content="CS Highlights">
+<meta property="og:description" content="CS2 精彩集锦">
+<meta property="og:image" content="covers/001.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -30,22 +35,18 @@
     --ambient-spread: 120px;
     --cursor-x: 50%;
     --cursor-y: 50%;
-    /* Accent colors — gold/orange system */
     --accent-1: #f0a500;
     --accent-2: #ff7b00;
     --accent-3: #ffd000;
     --accent-glow-1: rgba(240, 165, 0, 0.3);
     --accent-glow-2: rgba(255, 123, 0, 0.25);
     --accent-glow-3: rgba(255, 208, 0, 0.2);
-    /* Cut-corner clip paths */
     --clip-media: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     --clip-thumb: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
     --clip-btn: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   }
 
   /* ========== Keyframes ========== */
-
-  /* Page entrance */
   @keyframes fadeSlideDown {
     from { opacity: 0; transform: translateY(-20px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -61,19 +62,16 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Cover Ken Burns */
   @keyframes kenBurns {
     from { transform: scale(1); }
     to   { transform: scale(1.06); }
   }
 
-  /* Play button pulse */
   @keyframes playPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(240,165,0,0.3), 0 0 14px rgba(255,123,0,0.08); }
     50%      { box-shadow: 0 0 0 11px rgba(240,165,0,0), 0 0 28px rgba(240,165,0,0.12); }
   }
 
-  /* Cover directional transition (uses --slide-x) */
   @keyframes coverOut {
     from { opacity: 1; transform: scale(1)    translateX(0);              filter: brightness(1); }
     to   { opacity: 0; transform: scale(0.97) translateX(var(--slide-x)); filter: brightness(0.5); }
@@ -84,13 +82,11 @@
     to   { opacity: 1; transform: scale(1)    translateX(0);              filter: brightness(1); }
   }
 
-  /* Plaque slide up */
   @keyframes plaqueIn {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Player reveal / dismiss */
   @keyframes playerReveal {
     from { opacity: 0; transform: scale(0.93); filter: brightness(1.8); }
     to   { opacity: 1; transform: scale(1);    filter: brightness(1); }
@@ -101,46 +97,44 @@
     to   { opacity: 0; transform: scale(0.96); }
   }
 
-  /* Close button entrance */
   @keyframes closeBtnSlideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Active filmstrip thumb glow */
   @keyframes borderGlow {
     0%, 100% { border-color: rgba(240,165,0,0.4);  box-shadow: 0 0 6px rgba(240,165,0,0.1), 0 -4px 18px rgba(240,165,0,0.06); }
     50%      { border-color: rgba(240,165,0,0.9);   box-shadow: 0 0 16px rgba(255,123,0,0.2), 0 -6px 26px rgba(240,165,0,0.1); }
   }
 
-  /* Scan line sweep (one-shot on load) */
   @keyframes scanSweep {
-    from { transform: translateY(-100%); }
-    to   { transform: translateY(100vh); }
+    from { transform: translateY(-100%); opacity: 1; }
+    to   { transform: translateY(100vh); opacity: 0; }
   }
 
-  /* Light sweep across cover on transition */
   @keyframes lightSweep {
     from { transform: translateX(-100%) skewX(-15deg); }
     to   { transform: translateX(200%) skewX(-15deg); }
   }
 
-  /* Player open flash */
   @keyframes flashBurst {
     0%   { opacity: 0.7; }
     100% { opacity: 0; }
   }
 
-  /* Ambient glow pulse */
   @keyframes ambientPulse {
     0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
     50%      { opacity: 0.7; transform: translate(-50%, -50%) scale(1.06); }
   }
 
-  /* Topbar accent light */
   @keyframes topbarLight {
     0%   { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+  }
+
+  @keyframes loadingSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
   }
 
   /* ========== Reset ========== */
@@ -169,7 +163,6 @@
     background: var(--bg-dark);
   }
 
-  /* One-shot scan line on page load */
   body::after {
     content: '';
     position: fixed;
@@ -186,9 +179,7 @@
     width: 100%;
     pointer-events: none;
     z-index: 9999;
-    animation: scanSweep 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
-    opacity: 0;
-    animation-fill-mode: forwards;
+    animation: scanSweep 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
   }
 
   /* ========== Top Bar ========== */
@@ -203,7 +194,6 @@
     position: relative;
   }
 
-  /* Animated accent light under topbar */
   .topbar::after {
     content: '';
     position: absolute;
@@ -256,7 +246,6 @@
     overflow: hidden;
   }
 
-  /* Cursor-following light */
   .stage::before {
     content: '';
     position: absolute;
@@ -283,7 +272,6 @@
     z-index: 1;
   }
 
-  /* Ambient backlight glow behind showcase */
   .showcase::before {
     content: '';
     position: absolute;
@@ -306,12 +294,10 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    /* Sci-fi cut corners */
     clip-path: var(--clip-media);
     transition: filter 0.6s var(--ease-expo);
   }
 
-  /* Cut-corner gold frame border (sits behind media on showcase) */
   .showcase::after {
     content: '';
     position: absolute;
@@ -325,7 +311,6 @@
     z-index: 0;
   }
 
-  /* Light sweep overlay (triggered via JS class) */
   .showcase__media .light-sweep {
     position: absolute;
     inset: 0;
@@ -344,7 +329,6 @@
     animation: lightSweep 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  /* Player open flash overlay (triggered via JS class) */
   .showcase__media .flash-overlay {
     position: absolute;
     inset: 0;
@@ -354,7 +338,6 @@
     animation: flashBurst 0.35s ease-out forwards;
   }
 
-  /* CRT scan-line overlay */
   .showcase__media::after {
     content: '';
     position: absolute;
@@ -370,7 +353,6 @@
     z-index: 3;
   }
 
-  /* Subtle vignette */
   .showcase__media::before {
     content: '';
     position: absolute;
@@ -406,7 +388,6 @@
     pointer-events: none;
   }
 
-  /* Directional cover transitions */
   .showcase__cover.cover-out {
     animation: coverOut 0.35s var(--ease-expo) forwards;
     pointer-events: none;
@@ -416,7 +397,6 @@
     animation: coverIn 0.45s var(--ease-expo) both;
   }
 
-  /* Color placeholders for covers */
   .showcase__cover--placeholder {
     font-family: "Rajdhani", var(--font-mono);
     font-size: 14px;
@@ -424,6 +404,25 @@
     color: rgba(240,165,0,0.12);
     letter-spacing: 4px;
     text-transform: uppercase;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .showcase__cover--placeholder::before {
+    content: '\25C6';
+    display: block;
+    font-size: 22px;
+    margin-bottom: 6px;
+    color: rgba(240,165,0,0.08);
+  }
+
+  .showcase__cover--placeholder::after {
+    content: 'COMING SOON';
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+    color: rgba(240,165,0,0.06);
+    letter-spacing: 6px;
   }
 
   .showcase__player {
@@ -454,6 +453,46 @@
     display: block;
   }
 
+  /* Loading hint */
+  .loading-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(0,0,0,0.6);
+    z-index: 6;
+    pointer-events: none;
+  }
+
+  .loading-hint__spinner {
+    width: 28px;
+    height: 28px;
+    border: 2px solid rgba(240,165,0,0.15);
+    border-top-color: var(--accent-1);
+    border-radius: 50%;
+    animation: loadingSpin 0.8s linear infinite;
+  }
+
+  .loading-hint__text {
+    font-family: "Rajdhani", var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(240,165,0,0.5);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .loading-hint--error .loading-hint__spinner {
+    display: none;
+  }
+
+  .loading-hint--error .loading-hint__text {
+    color: #ff4444;
+  }
+
   /* ========== Close Button ========== */
   .close-btn {
     position: absolute;
@@ -470,7 +509,7 @@
     opacity: 0;
     pointer-events: none;
     transition: color var(--hover-duration) var(--ease);
-    z-index: 5;
+    z-index: 10;
   }
 
   .close-btn.visible {
@@ -484,7 +523,7 @@
     text-shadow: 0 0 14px rgba(240,165,0,0.4);
   }
 
-  /* ========== Plaque (label under cover) ========== */
+  /* ========== Plaque ========== */
   .plaque {
     margin-top: 18px;
     text-align: center;
@@ -500,9 +539,18 @@
     animation: plaqueIn 0.5s var(--ease-expo) 0.12s both;
   }
 
-  .plaque__info {
+  .plaque__title {
     font-family: "Rajdhani", "Noto Sans SC", sans-serif;
-    font-size: 13px;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .plaque__meta {
+    font-family: "Rajdhani", "Noto Sans SC", sans-serif;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-label);
     letter-spacing: 2px;
@@ -510,7 +558,7 @@
   }
 
   .plaque__separator {
-    margin: 0 10px;
+    margin: 0 8px;
     color: rgba(240,165,0,0.2);
   }
 
@@ -579,18 +627,14 @@
     filter: drop-shadow(0 0 10px rgba(240,165,0,0.2));
   }
 
-  .nav-arrow--prev {
-    left: 40px;
-  }
+  .nav-arrow--prev { left: 40px; }
 
   .nav-arrow--prev:hover {
     transform: translateY(-50%) translateX(-5px);
     filter: drop-shadow(0 0 14px rgba(240,165,0,0.12));
   }
 
-  .nav-arrow--next {
-    right: 40px;
-  }
+  .nav-arrow--next { right: 40px; }
 
   .nav-arrow--next:hover {
     transform: translateY(-50%) translateX(5px);
@@ -614,7 +658,7 @@
     gap: 4px;
     overflow-x: auto;
     overflow-y: hidden;
-    opacity: 0.3;
+    opacity: 0.6;
     transition: opacity var(--hover-duration) var(--ease);
     animation: fadeSlideUp 0.7s var(--ease-expo) 0.35s both;
   }
@@ -623,7 +667,6 @@
     opacity: 1;
   }
 
-  /* Hide scrollbar */
   .filmstrip::-webkit-scrollbar {
     height: 0;
     display: none;
@@ -669,6 +712,25 @@
     transform: scale(1.15);
   }
 
+  /* Keyboard accessibility */
+  .filmstrip__thumb:focus-visible {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 2px;
+    transform: scale(1.1);
+  }
+
+  .nav-arrow:focus-visible,
+  .play-btn:focus-visible,
+  .close-btn:focus-visible {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 4px;
+  }
+
+  .mobile-nav button:focus-visible {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 4px;
+  }
+
   /* ========== Mobile Page Indicator ========== */
   .page-indicator {
     display: none;
@@ -681,7 +743,7 @@
     padding: 8px;
   }
 
-  /* ========== Mobile Nav Buttons ========== */
+  /* ========== Mobile Nav ========== */
   .mobile-nav {
     display: none;
     justify-content: center;
@@ -714,7 +776,9 @@
   }
 
   .mobile-nav button:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
+    border-color: var(--accent-1);
+    box-shadow: 0 0 12px rgba(240,165,0,0.3);
   }
 
   .mobile-nav button svg {
@@ -728,6 +792,24 @@
   .mobile-nav button.hidden {
     opacity: 0.2;
     pointer-events: none;
+  }
+
+  /* ========== Reduced Motion ========== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .showcase__cover img {
+      animation: none;
+    }
+    .topbar::after {
+      animation: none;
+    }
+    body::after {
+      display: none;
+    }
   }
 
   /* ========== Responsive ========== */
@@ -750,7 +832,8 @@
 
     .stage { padding: 12px 0; }
 
-    .plaque__info { font-size: 10px; }
+    .plaque__title { font-size: 14px; }
+    .plaque__meta { font-size: 10px; }
   }
 </style>
 </head>
@@ -780,7 +863,8 @@
         </div>
       </div>
       <div class="plaque" id="plaque">
-        <div class="plaque__info" id="plaqueInfo"></div>
+        <div class="plaque__title" id="plaqueTitle"></div>
+        <div class="plaque__meta" id="plaqueMeta"></div>
         <button class="play-btn" id="playBtn" aria-label="Play">
           <svg viewBox="0 0 16 16"><polygon points="3,1 13,8 3,15"/></svg>
         </button>
@@ -811,13 +895,7 @@
 
 <script>
 // ============================================================
-//  在这里修改视频数据
-//  title: 视频标题
-//  map: 地图名
-//  date: 日期
-//  cover: 封面图路径（留空则用纯色占位）
-//  video: 视频直链（GitHub Releases 等）
-//  color: 封面占位色（仅在没有 cover 图时使用）
+//  Video data
 // ============================================================
 const works = [
   {
@@ -874,12 +952,11 @@ let transitionTimer = null;
 //  DOM refs
 // ============================================================
 const coverEl = document.getElementById('cover');
-const coverPlaceholder = document.getElementById('coverPlaceholder');
 const playerEl = document.getElementById('player');
-const closeBtn = document.getElementById('closeBtn');
 const playBtn = document.getElementById('playBtn');
 const plaqueEl = document.getElementById('plaque');
-const plaqueInfo = document.getElementById('plaqueInfo');
+const plaqueTitle = document.getElementById('plaqueTitle');
+const plaqueMeta = document.getElementById('plaqueMeta');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const filmstrip = document.getElementById('filmstrip');
@@ -898,16 +975,7 @@ function init() {
   setupKeyboard();
   setupSwipe();
   setupCursorLight();
-
-  // Set initial ambient color
   updateAmbientColor(0);
-
-  // Remove one-shot scan line after it plays
-  document.body.addEventListener('animationend', (e) => {
-    if (e.target === document.body) {
-      document.body.style.setProperty('--scan-done', '1');
-    }
-  });
 }
 
 // ============================================================
@@ -917,52 +985,39 @@ function showWork(index, isInitial) {
   if (index === currentIndex && !isInitial) return;
   if (isPlayerOpen) closePlayer();
 
-  // Cancel pending transition
   if (transitionTimer) {
     clearTimeout(transitionTimer);
     transitionTimer = null;
   }
 
-  // Determine direction: 1 = forward, -1 = backward
   const direction = index > currentIndex ? 1 : -1;
 
-  // Clear any lingering animation classes
   coverEl.classList.remove('cover-out', 'cover-in', 'hidden');
 
   if (isInitial) {
-    // First load: no directional slide, content just appears with page entrance
     applyWorkContent(index);
     plaqueEl.classList.remove('hidden');
     plaqueEl.classList.add('animate-in');
   } else {
-    // Directional transition
     isTransitioning = true;
 
-    // Set slide direction via CSS custom property
     coverEl.style.setProperty('--slide-x', direction > 0 ? '-30px' : '30px');
     coverEl.classList.add('cover-out');
 
-    // Fade out plaque immediately
     plaqueEl.classList.remove('animate-in');
     plaqueEl.classList.add('hidden');
 
     transitionTimer = setTimeout(() => {
-      // Swap content
       coverEl.classList.remove('cover-out');
       applyWorkContent(index);
 
-      // Slide in from opposite side
       coverEl.style.setProperty('--slide-x', direction > 0 ? '30px' : '-30px');
-      void coverEl.offsetWidth; // force reflow to restart animation
+      void coverEl.offsetWidth;
       coverEl.classList.add('cover-in');
 
-      // Light sweep effect
       triggerLightSweep();
-
-      // Update ambient backlight color
       updateAmbientColor(index);
 
-      // Plaque animates in
       plaqueEl.classList.remove('hidden');
       void plaqueEl.offsetWidth;
       plaqueEl.classList.add('animate-in');
@@ -970,7 +1025,6 @@ function showWork(index, isInitial) {
       isTransitioning = false;
       transitionTimer = null;
 
-      // Clean up cover-in class after animation ends
       coverEl.addEventListener('animationend', function handler() {
         coverEl.classList.remove('cover-in');
         coverEl.removeEventListener('animationend', handler);
@@ -983,12 +1037,11 @@ function showWork(index, isInitial) {
 }
 
 // ============================================================
-//  Apply work content (no animation logic, just DOM update)
+//  Apply work content
 // ============================================================
 function applyWorkContent(index) {
   const work = works[index];
 
-  // Cover
   if (work.cover) {
     coverEl.innerHTML = `<img src="${work.cover}" alt="${work.title}">`;
   } else {
@@ -996,35 +1049,31 @@ function applyWorkContent(index) {
     coverEl.innerHTML = `<span class="showcase__cover--placeholder">${work.title.toUpperCase()}</span>`;
   }
 
-  // Plaque text
-  plaqueInfo.innerHTML = `${work.title}<span class="plaque__separator">&mdash;</span>${work.map}<span class="plaque__separator">&mdash;</span>${work.date}`;
+  // Plaque — split into title + meta
+  plaqueTitle.textContent = work.title;
+  plaqueMeta.innerHTML = `${work.map}<span class="plaque__separator">&mdash;</span>${work.date}`;
 
-  // Play button visibility
   playBtn.style.display = work.video ? '' : 'none';
 }
 
 // ============================================================
-//  Update navigation state (arrows, filmstrip, indicators)
+//  Update navigation state
 // ============================================================
 function updateNavState(index) {
-  // Arrows
   prevBtn.classList.toggle('hidden', index === 0);
   nextBtn.classList.toggle('hidden', index === works.length - 1);
   mobilePrev.classList.toggle('hidden', index === 0);
   mobileNext.classList.toggle('hidden', index === works.length - 1);
 
-  // Filmstrip active state
   document.querySelectorAll('.filmstrip__thumb').forEach((el, i) => {
     el.classList.toggle('active', i === index);
   });
 
-  // Scroll filmstrip to show active thumb
   const activeThumb = filmstrip.children[index];
   if (activeThumb) {
     activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
 
-  // Page indicator (mobile)
   pageIndicator.textContent = `${index + 1} / ${works.length}`;
 }
 
@@ -1035,9 +1084,12 @@ function openPlayer() {
   const work = works[currentIndex];
   if (!work.video) return;
 
-  // Insert video element only on play
   playerEl.innerHTML = `
     <button class="close-btn visible" id="closeBtnInner">&#x2715; CLOSE</button>
+    <div class="loading-hint" id="loadingHint">
+      <div class="loading-hint__spinner"></div>
+      <div class="loading-hint__text">LOADING</div>
+    </div>
     <video
       src="${work.video}"
       controls
@@ -1049,6 +1101,21 @@ function openPlayer() {
 
   document.getElementById('closeBtnInner').addEventListener('click', closePlayer);
 
+  // Hide loading hint when video can play
+  const video = playerEl.querySelector('video');
+  const loadingHint = document.getElementById('loadingHint');
+
+  video.addEventListener('canplay', () => {
+    if (loadingHint) loadingHint.remove();
+  }, { once: true });
+
+  video.addEventListener('error', () => {
+    if (loadingHint) {
+      loadingHint.classList.add('loading-hint--error');
+      loadingHint.querySelector('.loading-hint__text').textContent = 'LOAD FAILED';
+    }
+  }, { once: true });
+
   coverEl.classList.add('hidden');
   playerEl.classList.remove('dismissing');
   playerEl.classList.add('active');
@@ -1057,32 +1124,26 @@ function openPlayer() {
   document.body.classList.add('player-open');
   isPlayerOpen = true;
 
-  // Flash burst on player open
   triggerFlash();
 
-  // Edge glow intensify with color
   const media = document.getElementById('mediaContainer');
   media.style.filter = 'drop-shadow(0 0 2px rgba(240,165,0,0.3)) drop-shadow(0 0 20px rgba(255,123,0,0.08))';
 }
 
 function closePlayer() {
-  // Dismiss animation
   playerEl.classList.remove('active');
   playerEl.classList.add('dismissing');
   coverEl.classList.remove('hidden');
   document.body.classList.remove('player-open');
 
-  // Plaque slides back in
   plaqueEl.classList.remove('hidden');
   void plaqueEl.offsetWidth;
   plaqueEl.classList.add('animate-in');
 
-  // Wait for dismiss animation, then destroy video
   setTimeout(() => {
     playerEl.classList.remove('dismissing');
     playerEl.innerHTML = '';
     isPlayerOpen = false;
-    // Restore normal edge glow
     const media = document.getElementById('mediaContainer');
     media.style.filter = '';
   }, 420);
@@ -1094,9 +1155,9 @@ function closePlayer() {
 function buildFilmstrip() {
   filmstrip.innerHTML = works.map((w, i) => {
     if (w.cover) {
-      return `<div class="filmstrip__thumb" data-index="${i}"><img src="${w.cover}" alt="${w.title}"></div>`;
+      return `<div class="filmstrip__thumb" data-index="${i}" tabindex="0" role="button" aria-label="${w.title}"><img src="${w.cover}" alt="${w.title}"></div>`;
     } else {
-      return `<div class="filmstrip__thumb" data-index="${i}" style="background:${w.color || '#2a2a2a'}"></div>`;
+      return `<div class="filmstrip__thumb" data-index="${i}" tabindex="0" role="button" aria-label="${w.title}" style="background:${w.color || '#2a2a2a'}"></div>`;
     }
   }).join('');
 
@@ -1104,6 +1165,16 @@ function buildFilmstrip() {
     const thumb = e.target.closest('.filmstrip__thumb');
     if (!thumb) return;
     showWork(parseInt(thumb.dataset.index));
+  });
+
+  // Keyboard support for filmstrip
+  filmstrip.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const thumb = e.target.closest('.filmstrip__thumb');
+      if (!thumb) return;
+      e.preventDefault();
+      showWork(parseInt(thumb.dataset.index));
+    }
   });
 }
 
@@ -1124,7 +1195,6 @@ mobilePrev.addEventListener('click', goPrev);
 mobileNext.addEventListener('click', goNext);
 playBtn.addEventListener('click', openPlayer);
 
-// ========== Keyboard ==========
 function setupKeyboard() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') goPrev();
@@ -1133,10 +1203,8 @@ function setupKeyboard() {
   });
 }
 
-// ========== Touch Swipe (mobile) ==========
 function setupSwipe() {
   let touchStartX = 0;
-  let touchEndX = 0;
   const stage = document.querySelector('.stage');
 
   stage.addEventListener('touchstart', (e) => {
@@ -1144,8 +1212,7 @@ function setupSwipe() {
   }, { passive: true });
 
   stage.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    const diff = touchStartX - touchEndX;
+    const diff = touchStartX - e.changedTouches[0].screenX;
     if (Math.abs(diff) > 50) {
       if (diff > 0) goNext();
       else goPrev();
@@ -1156,52 +1223,40 @@ function setupSwipe() {
 // ============================================================
 //  Light Effects
 // ============================================================
-
-// Cursor-following ambient light
 function setupCursorLight() {
   const stage = document.querySelector('.stage');
   stage.addEventListener('mousemove', (e) => {
     const rect = stage.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    stage.style.setProperty('--cursor-x', x + 'px');
-    stage.style.setProperty('--cursor-y', y + 'px');
+    stage.style.setProperty('--cursor-x', (e.clientX - rect.left) + 'px');
+    stage.style.setProperty('--cursor-y', (e.clientY - rect.top) + 'px');
   });
 }
 
-// Light sweep across cover on work transition
 function triggerLightSweep() {
   const media = document.getElementById('mediaContainer');
-  // Remove old sweep if exists
   const old = media.querySelector('.light-sweep');
   if (old) old.remove();
 
   const sweep = document.createElement('div');
   sweep.className = 'light-sweep';
   media.appendChild(sweep);
-
   sweep.addEventListener('animationend', () => sweep.remove());
 }
 
-// Flash burst on player open
 function triggerFlash() {
   const media = document.getElementById('mediaContainer');
   const flash = document.createElement('div');
   flash.className = 'flash-overlay';
   media.appendChild(flash);
-
   flash.addEventListener('animationend', () => flash.remove());
 }
 
-// Update ambient backlight color based on current work
 function updateAmbientColor(index) {
   const work = works[index];
   const color = work.color || '#2a3040';
-  // Parse hex
   const r = parseInt(color.slice(1, 3), 16);
   const g = parseInt(color.slice(3, 5), 16);
   const b = parseInt(color.slice(5, 7), 16);
-  // Blend work color with gold/orange accent for warm glow
   const br1 = Math.min(255, Math.round(r * 0.3 + 240 * 0.7));
   const bg1 = Math.min(255, Math.round(g * 0.3 + 165 * 0.7));
   const bb1 = Math.min(255, Math.round(b * 0.3 + 0 * 0.7));

@@ -21,6 +21,84 @@
     --fade-duration: 0.4s;
     --hover-duration: 0.3s;
     --ease: ease-in-out;
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --slide-x: 0px;
+  }
+
+  /* ========== Keyframes ========== */
+
+  /* Page entrance */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeScaleIn {
+    from { opacity: 0; transform: scale(0.92); filter: brightness(0.5); }
+    to   { opacity: 1; transform: scale(1);    filter: brightness(1); }
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cover Ken Burns */
+  @keyframes kenBurns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+  }
+
+  /* Play button pulse */
+  @keyframes playPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.22); }
+    50%      { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+  }
+
+  /* Cover directional transition (uses --slide-x) */
+  @keyframes coverOut {
+    from { opacity: 1; transform: scale(1)    translateX(0);              filter: brightness(1); }
+    to   { opacity: 0; transform: scale(0.97) translateX(var(--slide-x)); filter: brightness(0.5); }
+  }
+
+  @keyframes coverIn {
+    from { opacity: 0; transform: scale(0.97) translateX(var(--slide-x)); filter: brightness(0.5); }
+    to   { opacity: 1; transform: scale(1)    translateX(0);              filter: brightness(1); }
+  }
+
+  /* Plaque slide up */
+  @keyframes plaqueIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Player reveal / dismiss */
+  @keyframes playerReveal {
+    from { opacity: 0; transform: scale(0.93); filter: brightness(1.8); }
+    to   { opacity: 1; transform: scale(1);    filter: brightness(1); }
+  }
+
+  @keyframes playerDismiss {
+    from { opacity: 1; transform: scale(1);    }
+    to   { opacity: 0; transform: scale(0.96); }
+  }
+
+  /* Close button entrance */
+  @keyframes closeBtnSlideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Active filmstrip thumb glow */
+  @keyframes borderGlow {
+    0%, 100% { border-color: rgba(255,255,255,0.5); box-shadow: 0 0 4px rgba(255,255,255,0.06); }
+    50%      { border-color: rgba(255,255,255,1);   box-shadow: 0 0 14px rgba(255,255,255,0.12); }
+  }
+
+  /* Scan line sweep (one-shot on load) */
+  @keyframes scanSweep {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(100vh); }
   }
 
   /* ========== Reset ========== */
@@ -42,11 +120,33 @@
     display: flex;
     flex-direction: column;
     user-select: none;
-    transition: background var(--fade-duration) var(--ease);
+    transition: background 0.6s var(--ease-expo);
   }
 
   body.player-open {
     background: var(--bg-dark);
+  }
+
+  /* One-shot scan line on page load */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255,255,255,0.04) 45%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.04) 55%,
+      transparent 100%
+    );
+    height: 120px;
+    width: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanSweep 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+    opacity: 0;
+    animation-fill-mode: forwards;
   }
 
   /* ========== Top Bar ========== */
@@ -57,6 +157,7 @@
     padding: 12px 24px;
     border-bottom: 1px solid var(--border-thin);
     flex-shrink: 0;
+    animation: fadeSlideDown 0.7s var(--ease-expo) both;
   }
 
   .topbar__name {
@@ -93,12 +194,40 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    animation: fadeScaleIn 0.9s var(--ease-expo) 0.15s both;
   }
 
   .showcase__media {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  /* CRT scan-line overlay */
+  .showcase__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.035) 2px,
+      rgba(0,0,0,0.035) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* Subtle vignette */
+  .showcase__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.4);
+    pointer-events: none;
+    z-index: 2;
   }
 
   .showcase__cover {
@@ -109,6 +238,7 @@
     align-items: center;
     justify-content: center;
     opacity: 1;
+    will-change: transform, opacity, filter;
     transition: opacity var(--fade-duration) var(--ease);
   }
 
@@ -117,11 +247,23 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    animation: kenBurns 20s ease-in-out infinite alternate;
+    will-change: transform;
   }
 
   .showcase__cover.hidden {
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* Directional cover transitions */
+  .showcase__cover.cover-out {
+    animation: coverOut 0.35s var(--ease-expo) forwards;
+    pointer-events: none;
+  }
+
+  .showcase__cover.cover-in {
+    animation: coverIn 0.45s var(--ease-expo) both;
   }
 
   /* Color placeholders for covers */
@@ -137,12 +279,19 @@
     inset: 0;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--fade-duration) var(--ease);
+    will-change: transform, opacity;
+    z-index: 1;
   }
 
   .showcase__player.active {
     opacity: 1;
     pointer-events: auto;
+    animation: playerReveal 0.55s var(--ease-expo) both;
+  }
+
+  .showcase__player.dismissing {
+    animation: playerDismiss 0.4s var(--ease-expo) forwards;
+    pointer-events: none;
   }
 
   .showcase__player video {
@@ -167,28 +316,35 @@
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--fade-duration) var(--ease), color var(--hover-duration) var(--ease);
+    transition: color var(--hover-duration) var(--ease);
+    z-index: 5;
   }
 
   .close-btn.visible {
     opacity: 1;
     pointer-events: auto;
+    animation: closeBtnSlideIn 0.4s var(--ease-expo) 0.2s both;
   }
 
   .close-btn:hover {
     color: var(--text-label-hover);
+    text-shadow: 0 0 12px rgba(255,255,255,0.3);
   }
 
   /* ========== Plaque (label under cover) ========== */
   .plaque {
     margin-top: 18px;
     text-align: center;
-    transition: opacity var(--fade-duration) var(--ease);
+    will-change: transform, opacity;
   }
 
   .plaque.hidden {
     opacity: 0;
     pointer-events: none;
+  }
+
+  .plaque.animate-in {
+    animation: plaqueIn 0.5s var(--ease-expo) 0.12s both;
   }
 
   .plaque__info {
@@ -214,11 +370,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: border-color var(--hover-duration) var(--ease);
+    transition: border-color var(--hover-duration) var(--ease),
+                transform var(--hover-duration) var(--ease-expo),
+                box-shadow var(--hover-duration) var(--ease);
+    animation: playPulse 2.8s ease-in-out infinite;
   }
 
   .play-btn:hover {
     border-color: var(--text-label-hover);
+    transform: scale(1.18);
+    box-shadow: 0 0 20px rgba(255,255,255,0.12);
+    animation: none;
   }
 
   .play-btn svg {
@@ -243,7 +405,8 @@
     cursor: pointer;
     padding: 20px;
     z-index: 10;
-    transition: opacity var(--hover-duration) var(--ease);
+    transition: opacity var(--hover-duration) var(--ease),
+                transform var(--hover-duration) var(--ease-expo);
   }
 
   .nav-arrow svg {
@@ -252,19 +415,29 @@
     stroke: var(--arrow);
     stroke-width: 1.5;
     fill: none;
-    transition: stroke var(--hover-duration) var(--ease);
+    transition: stroke var(--hover-duration) var(--ease),
+                filter var(--hover-duration) var(--ease);
   }
 
   .nav-arrow:hover svg {
     stroke: var(--arrow-hover);
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
   }
 
   .nav-arrow--prev {
     left: 40px;
   }
 
+  .nav-arrow--prev:hover {
+    transform: translateY(-50%) translateX(-5px);
+  }
+
   .nav-arrow--next {
     right: 40px;
+  }
+
+  .nav-arrow--next:hover {
+    transform: translateY(-50%) translateX(5px);
   }
 
   .nav-arrow.hidden {
@@ -286,6 +459,7 @@
     overflow-y: hidden;
     opacity: 0.3;
     transition: opacity var(--hover-duration) var(--ease);
+    animation: fadeSlideUp 0.7s var(--ease-expo) 0.35s both;
   }
 
   .filmstrip:hover {
@@ -305,9 +479,13 @@
     aspect-ratio: 16 / 9;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: border-color var(--hover-duration) var(--ease);
+    transition: border-color var(--hover-duration) var(--ease),
+                transform var(--hover-duration) var(--ease-expo),
+                filter var(--hover-duration) var(--ease),
+                box-shadow var(--hover-duration) var(--ease);
     overflow: hidden;
     background: #2a2a2a;
+    position: relative;
   }
 
   .filmstrip__thumb img {
@@ -317,8 +495,20 @@
     display: block;
   }
 
+  .filmstrip__thumb:hover {
+    transform: scale(1.15);
+    filter: brightness(1.25);
+    z-index: 2;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
   .filmstrip__thumb.active {
-    border-color: var(--border-active);
+    animation: borderGlow 2.2s ease-in-out infinite;
+    transform: scale(1.05);
+  }
+
+  .filmstrip__thumb.active:hover {
+    transform: scale(1.15);
   }
 
   /* ========== Mobile Page Indicator ========== */
@@ -351,12 +541,21 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: border-color var(--hover-duration) var(--ease), color var(--hover-duration) var(--ease);
+    transition: border-color var(--hover-duration) var(--ease),
+                color var(--hover-duration) var(--ease),
+                transform var(--hover-duration) var(--ease-expo),
+                box-shadow var(--hover-duration) var(--ease);
   }
 
   .mobile-nav button:hover {
     border-color: var(--arrow-hover);
     color: var(--text-label-hover);
+    transform: scale(1.1);
+    box-shadow: 0 0 16px rgba(255,255,255,0.06);
+  }
+
+  .mobile-nav button:active {
+    transform: scale(0.95);
   }
 
   .mobile-nav button svg {
@@ -509,6 +708,8 @@ const works = [
 // ============================================================
 let currentIndex = 0;
 let isPlayerOpen = false;
+let isTransitioning = false;
+let transitionTimer = null;
 
 // ============================================================
 //  DOM refs
@@ -534,19 +735,88 @@ const mobileNext = document.getElementById('mobileNext');
 function init() {
   workCount.textContent = works.length + ' WORKS';
   buildFilmstrip();
-  showWork(0);
+  showWork(0, true);
   setupKeyboard();
   setupSwipe();
+
+  // Remove one-shot scan line after it plays
+  document.body.addEventListener('animationend', (e) => {
+    if (e.target === document.body) {
+      document.body.style.setProperty('--scan-done', '1');
+    }
+  });
 }
 
 // ============================================================
 //  Show a work by index
 // ============================================================
-function showWork(index) {
-  // Close player if open
+function showWork(index, isInitial) {
+  if (index === currentIndex && !isInitial) return;
   if (isPlayerOpen) closePlayer();
 
+  // Cancel pending transition
+  if (transitionTimer) {
+    clearTimeout(transitionTimer);
+    transitionTimer = null;
+  }
+
+  // Determine direction: 1 = forward, -1 = backward
+  const direction = index > currentIndex ? 1 : -1;
+
+  // Clear any lingering animation classes
+  coverEl.classList.remove('cover-out', 'cover-in', 'hidden');
+
+  if (isInitial) {
+    // First load: no directional slide, content just appears with page entrance
+    applyWorkContent(index);
+    plaqueEl.classList.remove('hidden');
+    plaqueEl.classList.add('animate-in');
+  } else {
+    // Directional transition
+    isTransitioning = true;
+
+    // Set slide direction via CSS custom property
+    coverEl.style.setProperty('--slide-x', direction > 0 ? '-30px' : '30px');
+    coverEl.classList.add('cover-out');
+
+    // Fade out plaque immediately
+    plaqueEl.classList.remove('animate-in');
+    plaqueEl.classList.add('hidden');
+
+    transitionTimer = setTimeout(() => {
+      // Swap content
+      coverEl.classList.remove('cover-out');
+      applyWorkContent(index);
+
+      // Slide in from opposite side
+      coverEl.style.setProperty('--slide-x', direction > 0 ? '30px' : '-30px');
+      void coverEl.offsetWidth; // force reflow to restart animation
+      coverEl.classList.add('cover-in');
+
+      // Plaque animates in
+      plaqueEl.classList.remove('hidden');
+      void plaqueEl.offsetWidth;
+      plaqueEl.classList.add('animate-in');
+
+      isTransitioning = false;
+      transitionTimer = null;
+
+      // Clean up cover-in class after animation ends
+      coverEl.addEventListener('animationend', function handler() {
+        coverEl.classList.remove('cover-in');
+        coverEl.removeEventListener('animationend', handler);
+      });
+    }, 300);
+  }
+
   currentIndex = index;
+  updateNavState(index);
+}
+
+// ============================================================
+//  Apply work content (no animation logic, just DOM update)
+// ============================================================
+function applyWorkContent(index) {
   const work = works[index];
 
   // Cover
@@ -556,12 +826,18 @@ function showWork(index) {
     coverEl.style.background = work.color || '#2a2a2a';
     coverEl.innerHTML = `<span class="showcase__cover--placeholder">${work.title.toUpperCase()}</span>`;
   }
-  coverEl.classList.remove('hidden');
 
-  // Plaque
+  // Plaque text
   plaqueInfo.innerHTML = `${work.title}<span class="plaque__separator">&mdash;</span>${work.map}<span class="plaque__separator">&mdash;</span>${work.date}`;
-  plaqueEl.classList.remove('hidden');
 
+  // Play button visibility
+  playBtn.style.display = work.video ? '' : 'none';
+}
+
+// ============================================================
+//  Update navigation state (arrows, filmstrip, indicators)
+// ============================================================
+function updateNavState(index) {
   // Arrows
   prevBtn.classList.toggle('hidden', index === 0);
   nextBtn.classList.toggle('hidden', index === works.length - 1);
@@ -581,9 +857,6 @@ function showWork(index) {
 
   // Page indicator (mobile)
   pageIndicator.textContent = `${index + 1} / ${works.length}`;
-
-  // Play button visibility
-  playBtn.style.display = work.video ? '' : 'none';
 }
 
 // ============================================================
@@ -593,7 +866,7 @@ function openPlayer() {
   const work = works[currentIndex];
   if (!work.video) return;
 
-  // Insert video element only on play (performance)
+  // Insert video element only on play
   playerEl.innerHTML = `
     <button class="close-btn visible" id="closeBtnInner">&#x2715; CLOSE</button>
     <video
@@ -608,24 +881,32 @@ function openPlayer() {
   document.getElementById('closeBtnInner').addEventListener('click', closePlayer);
 
   coverEl.classList.add('hidden');
+  playerEl.classList.remove('dismissing');
   playerEl.classList.add('active');
   plaqueEl.classList.add('hidden');
+  plaqueEl.classList.remove('animate-in');
   document.body.classList.add('player-open');
   isPlayerOpen = true;
 }
 
 function closePlayer() {
+  // Dismiss animation
   playerEl.classList.remove('active');
+  playerEl.classList.add('dismissing');
   coverEl.classList.remove('hidden');
-  plaqueEl.classList.remove('hidden');
   document.body.classList.remove('player-open');
-  isPlayerOpen = true;
 
-  // Wait for fade out then destroy video to stop playback
+  // Plaque slides back in
+  plaqueEl.classList.remove('hidden');
+  void plaqueEl.offsetWidth;
+  plaqueEl.classList.add('animate-in');
+
+  // Wait for dismiss animation, then destroy video
   setTimeout(() => {
+    playerEl.classList.remove('dismissing');
     playerEl.innerHTML = '';
     isPlayerOpen = false;
-  }, 400);
+  }, 420);
 }
 
 // ============================================================
@@ -651,11 +932,11 @@ function buildFilmstrip() {
 //  Navigation
 // ============================================================
 function goPrev() {
-  if (currentIndex > 0) showWork(currentIndex - 1);
+  if (currentIndex > 0 && !isTransitioning) showWork(currentIndex - 1);
 }
 
 function goNext() {
-  if (currentIndex < works.length - 1) showWork(currentIndex + 1);
+  if (currentIndex < works.length - 1 && !isTransitioning) showWork(currentIndex + 1);
 }
 
 prevBtn.addEventListener('click', goPrev);

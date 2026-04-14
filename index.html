@@ -852,37 +852,54 @@ float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(.866,.5,-.5,.866);for(int i=0;i<6;
 
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes;
-  float t=uTime*.08;
-
-  // Domain warping — visible flowing structure
-  vec2 q=vec2(fbm(uv*3.+t),
-              fbm(uv*3.+vec2(5.2,1.3)+t*.7));
-  vec2 r=vec2(fbm(uv*3.+q*2.5+vec2(1.7,9.2)+t*.35),
-              fbm(uv*3.+q*2.5+vec2(8.3,2.8)+t*.25));
-  float f=fbm(uv*3.+r*2.);
-
-  float n1=f*.5+.5;
-  float ql=length(q);
-
-  // Base glow following flow
+  float t=uTime;
   vec3 c=vec3(0.);
-  c+=uCol1*pow(n1,2.)*.18;
-  c+=uCol2*pow(1.-n1,2.)*.12;
-  c+=mix(uCol1,uCol2,n1)*clamp(ql*.4,0.,1.)*.15;
 
-  // Energy veins — thin bright curves tracing the flow
-  c+=uCol1*smoothstep(.025,.0,abs(f-.35))*.45;
-  c+=uCol2*smoothstep(.02,.0,abs(f+.15))*.35;
-  c+=mix(uCol1,uCol2,.6)*smoothstep(.03,.0,abs(fbm(uv*4.+r*.8+t*.12)-.25))*.2;
+  // === 3 aurora curtain layers ===
+  for(int i=0;i<3;i++){
+    float fi=float(i);
+    float spd=.04+fi*.012;
 
-  // Depth gradient along warp intensity
-  c=mix(c,uCol2*.3,clamp(pow(length(r),2.)*.5,0.,1.));
+    // Curtain base edge — organic undulation
+    float base=.25+fi*.18;
+    base+=fbm(vec2(uv.x*1.5+fi*4.,t*spd))*.15;
+    base+=sin(uv.x*4.+t*spd*3.+fi*2.2)*.05;
 
-  // Burst: brief global brightening
-  c*=1.+uBurst*uBurst*.6;
+    // Distance above edge
+    float above=uv.y-base;
+
+    // Profile: bright at edge, decays upward
+    float edge=smoothstep(-.02,.01,above);
+    float profile=edge*exp(-above*above*5.)
+                 +smoothstep(0.,.02,above)*exp(-above*2.)*.4;
+
+    // Vertical ray columns
+    float rays=noise(vec2(uv.x*15.+t*(.08+fi*.03),fi*5.));
+    rays=smoothstep(.3,.7,rays);
+    rays*=.7+noise(vec2(uv.x*40.+t*.2,fi*3.))*.3;
+
+    // Brightness pulse — different parts at different times
+    float pulse=sin(t*.25+fi*1.5+uv.x*1.5)*.3+.7;
+
+    // Color gradient along curtain
+    vec3 col=mix(uCol1,uCol2,sin(uv.x*2.5+t*.06+fi*2.)*.5+.5);
+    col+=mix(uCol1,uCol2,.5)*smoothstep(.05,0.,above)*.25;
+
+    c+=col*profile*rays*pulse*.6;
+  }
+
+  // Shimmer points
+  float sp=noise(uv*60.+t*.3);
+  c+=mix(uCol1,uCol2,.5)*pow(sp,10.)*1.5;
+
+  // Overall breathing
+  c*=sin(t*.12)*.12+.88;
+
+  // Burst flash
+  c*=1.+uBurst*uBurst*.8;
 
   // Vignette
-  c*=clamp(1.-dot(uv-.5,uv-.5)*1.5,0.,1.);
+  c*=clamp(1.-dot(uv-.5,uv-.5)*1.2,0.,1.);
   gl_FragColor=vec4(c,1.);
 }`);
   if(!vs||!fs)return;

@@ -56,6 +56,15 @@
 @keyframes coverMorphOut{0%{opacity:1;transform:scale(1);filter:brightness(1)}100%{opacity:0;transform:scale(1.08);filter:brightness(.15)}}
 @keyframes coverMorphIn{0%{opacity:0;transform:scale(1.08);filter:brightness(.15)}100%{opacity:1;transform:scale(1);filter:brightness(1)}}
 @keyframes rippleExpand{0%{width:0;height:0;opacity:.6}100%{width:120px;height:120px;opacity:0}}
+@keyframes digitRollIn{0%{transform:translateY(110%);opacity:0}50%{opacity:1}100%{transform:translateY(0);opacity:1}}
+@keyframes weaponReveal{from{max-width:0}to{max-width:200px}}
+@keyframes mvpFlare{0%{transform:scale(0) rotate(-15deg);opacity:0;filter:brightness(3) drop-shadow(0 0 12px var(--accent-1))}55%{transform:scale(1.5) rotate(5deg);opacity:1;filter:brightness(1.8) drop-shadow(0 0 20px var(--accent-1))}100%{transform:scale(1) rotate(0);opacity:1;filter:brightness(1) drop-shadow(0 0 4px rgba(240,165,0,.3))}}
+@keyframes mvpRingBurst{0%{width:0;height:0;opacity:.8}100%{width:50px;height:50px;opacity:0}}
+@keyframes sideStrokeDraw{from{stroke-dashoffset:120}to{stroke-dashoffset:0}}
+@keyframes hudReveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes hudScanMove{0%{left:-40%}100%{left:140%}}
+@keyframes pagePulse{0%{opacity:.2}100%{opacity:0}}
+@keyframes transSweep{from{left:-250px}to{left:calc(100% + 250px)}}
 
 /* === Reset === */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -74,8 +83,9 @@ body::after{content:'';position:fixed;inset:0;background:linear-gradient(180deg,
 
 /* === Blurred Background === */
 .bg-blur{position:fixed;inset:-30px;z-index:0;overflow:hidden;background:var(--bg)}
-.bg-blur img{width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(50px) brightness(.3) saturate(1.2);opacity:0;transition:opacity 1.2s var(--ease)}
+.bg-blur img{width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(50px) brightness(.3) saturate(1.2);opacity:0;transition:opacity 1.2s var(--ease),filter .3s var(--ease)}
 .bg-blur img.visible{opacity:1}
+.bg-blur.hue-shift img{filter:blur(50px) brightness(.4) saturate(1.5) hue-rotate(20deg)}
 body.cinema-mode .bg-blur img{filter:blur(60px) brightness(.12) saturate(.8)}
 
 /* === Boot Screen === */
@@ -93,7 +103,7 @@ body.cinema-mode .bg-blur img{filter:blur(60px) brightness(.12) saturate(.8)}
 #particleCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;mix-blend-mode:screen}
 
 /* === Top Bar === */
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px;border-bottom:1px solid var(--border-thin);flex-shrink:0;animation:fadeSlideDown .7s var(--ease-expo) both;position:relative;transition:opacity .4s,transform .4s}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 24px;border-bottom:1px solid var(--border-thin);flex-shrink:0;animation:fadeSlideDown .7s var(--ease-expo) both;position:relative;transition:opacity .4s,transform .4s,border-color .5s,box-shadow .5s}
 .topbar::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,transparent 30%,var(--accent-1) 42%,var(--accent-2) 50%,var(--accent-3) 58%,transparent 70%,transparent 100%);background-size:200% 100%;animation:topbarLight 8s ease-in-out infinite;opacity:.6}
 .topbar__name{font-family:"Rajdhani",var(--font-mono);font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text-label)}
 .topbar__controls{display:flex;align-items:center;gap:16px}
@@ -221,7 +231,7 @@ body.cinema-mode .corner-accents{opacity:0}
 .nav-arrow.hidden{opacity:0;pointer-events:none}
 
 /* Filmstrip */
-.filmstrip{flex-shrink:0;height:66px;background:var(--bg-filmstrip);border-top:1px solid var(--border-thin);display:flex;align-items:center;padding:0 12px;gap:4px;overflow-x:auto;overflow-y:hidden;opacity:.6;transition:opacity var(--hover-duration) var(--ease),transform .4s;animation:fadeSlideUp .7s var(--ease-expo) .35s both}
+.filmstrip{flex-shrink:0;height:66px;background:var(--bg-filmstrip);border-top:1px solid var(--border-thin);display:flex;align-items:center;padding:0 12px;gap:4px;overflow-x:auto;overflow-y:hidden;opacity:.6;transition:opacity var(--hover-duration) var(--ease),transform .4s,border-color .5s,box-shadow .5s;animation:fadeSlideUp .7s var(--ease-expo) .35s both}
 .filmstrip:hover{opacity:1}
 .filmstrip::-webkit-scrollbar{height:0;display:none}.filmstrip{scrollbar-width:none}
 .filmstrip__thumb{flex-shrink:0;height:44px;aspect-ratio:16/9;cursor:pointer;border:1px solid transparent;transition:border-color var(--hover-duration) var(--ease),transform var(--hover-duration) var(--ease-expo),filter var(--hover-duration) var(--ease),box-shadow var(--hover-duration) var(--ease);overflow:hidden;background:#2a2a2a;position:relative;clip-path:var(--clip-thumb)}
@@ -295,14 +305,28 @@ body[data-theme="ct"].player-open{background:var(--bg-dark)}
 .hitmarker{position:fixed;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
 .hitmarker__line{position:absolute;width:1.5px;height:10px;background:var(--accent-1);left:-.75px;top:-5px;transform-origin:center center;animation:hmExpand .3s ease-out forwards;box-shadow:0 0 4px var(--accent-1)}
 
-/* HUD Panel */
-.hud{display:flex;align-items:center;justify-content:center;gap:0;margin-top:8px;min-height:20px}
+/* HUD Tactical Panel */
+.hud{display:flex;align-items:center;justify-content:center;gap:0;margin-top:8px;min-height:20px;position:relative;overflow:hidden}
 .hud:empty{display:none}
+.hud.hud--tactical{border:1px solid var(--border-thin);background:rgba(0,0,0,.2);padding:8px 4px;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);animation:hudReveal .6s var(--ease-expo) .1s both}
+.hud__scan{position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(240,165,0,.06),transparent);pointer-events:none;animation:hudScanMove 3s ease-in-out infinite .8s}
 .hud__item{display:flex;align-items:center;gap:5px;padding:2px 14px;font-family:"Rajdhani",var(--font-mono);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-label);opacity:0;animation:hudStatIn .4s var(--ease-expo) both}
 .hud__item+.hud__item{border-left:1px solid var(--border-thin)}
 .hud__val{color:rgba(255,255,255,.8);font-size:14px;font-weight:700;letter-spacing:1px}
-.hud__mvp .hud__val{color:var(--accent-1);text-shadow:0 0 8px rgba(240,165,0,.3)}
-.hud__side{font-size:10px;padding:1px 6px;border:1px solid var(--border-thin);letter-spacing:2px;color:var(--accent-1);opacity:.6}
+.hud__side-box{position:relative;display:inline-block;padding:1px 7px}
+.hud__side-box svg{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);fill:none;stroke:var(--accent-1);stroke-width:1;stroke-dasharray:120;stroke-dashoffset:120;animation:sideStrokeDraw .8s ease-out .3s forwards}
+.hud__side-box .hud__val{font-size:10px;letter-spacing:2px;color:var(--accent-1)}
+.hud__digit{display:inline-block;overflow:hidden;height:1.2em;vertical-align:bottom}
+.hud__digit span{display:block;animation:digitRollIn .45s var(--ease-expo) both}
+.hud__weapon-text{display:inline-block;overflow:hidden;white-space:nowrap;max-width:0;animation:weaponReveal .5s steps(15) .35s forwards;color:rgba(255,255,255,.8);font-size:14px;font-weight:700;letter-spacing:1px}
+.hud__mvp-val{display:inline-flex;align-items:center;position:relative;animation:mvpFlare .7s var(--ease-expo) .55s both;opacity:0;color:var(--accent-1);font-size:14px;font-weight:700;letter-spacing:1px;text-shadow:0 0 8px rgba(240,165,0,.3)}
+.hud__mvp-ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1.5px solid var(--accent-1);border-radius:50%;pointer-events:none;animation:mvpRingBurst .65s ease-out .6s both;box-shadow:0 0 8px var(--accent-1)}
+
+/* Page Transition FX */
+.page-trans-flash{position:fixed;inset:0;pointer-events:none;z-index:9997;background:radial-gradient(ellipse at center,var(--accent-glow-1),transparent 70%);animation:pagePulse .4s ease-out forwards}
+.page-trans-sweep{position:fixed;top:0;bottom:0;width:200px;pointer-events:none;z-index:9997;background:linear-gradient(90deg,transparent 0%,var(--accent-glow-2) 35%,var(--accent-glow-1) 50%,var(--accent-glow-2) 65%,transparent 100%);animation:transSweep .5s ease-in-out forwards}
+.topbar.bar-flash{border-bottom-color:var(--accent-1)!important;box-shadow:0 1px 25px var(--accent-glow-1)}
+.filmstrip.bar-flash{border-top-color:var(--accent-1)!important;box-shadow:0 -1px 25px var(--accent-glow-1)}
 
 /* Kill Feed */
 .killfeed{position:fixed;top:70px;right:20px;z-index:10001;display:flex;flex-direction:column;gap:6px;pointer-events:none}
@@ -518,7 +542,7 @@ function showWork(index,isInitial,useFlip){
   coverEl.classList.remove('cover-out','cover-in','hidden','morphing-out','morphing-in');
   if(isInitial){applyWorkContent(index);plaqueEl.classList.remove('hidden');plaqueEl.classList.add('animate-in')}
   else if(useFlip){
-    isTransitioning=true;sfx.whoosh();burstParticles();
+    isTransitioning=true;sfx.whoosh();triggerPageTransition();
     plaqueEl.classList.remove('animate-in');plaqueEl.classList.add('hidden');
     mediaContainer.style.transition='transform .28s ease-in,opacity .28s';
     mediaContainer.style.transform='perspective(800px) rotateX('+(dir>0?'70':'-70')+'deg)';
@@ -535,7 +559,7 @@ function showWork(index,isInitial,useFlip){
     },300);
   }
   else{
-    isTransitioning=true;triggerGlitch();burstParticles();sfx.whoosh();
+    isTransitioning=true;triggerGlitch();triggerPageTransition();sfx.whoosh();
     coverEl.style.setProperty('--slide-x',dir>0?'-30px':'30px');coverEl.classList.add('cover-out');
     plaqueEl.classList.remove('animate-in');plaqueEl.classList.add('hidden');
     transitionTimer=setTimeout(()=>{
@@ -815,6 +839,26 @@ function updateAmbientColor(i){
   document.documentElement.style.setProperty('--accent-glow-2',`rgba(${Math.min(255,Math.round(r*.3+255*.7))},${Math.min(255,Math.round(g*.3+123*.7))},${Math.min(255,Math.round(b*.3))},0.18)`);
 }
 
+// Page-Level Transition Cinematics
+function triggerPageTransition(){
+  if(prefersReducedMotion)return;
+  burstParticles();
+  // 1. Full-screen radial flash
+  const flash=document.createElement('div');flash.className='page-trans-flash';
+  document.body.appendChild(flash);flash.addEventListener('animationend',()=>flash.remove());
+  // 2. Horizontal sweep line
+  const sweep=document.createElement('div');sweep.className='page-trans-sweep';
+  document.body.appendChild(sweep);sweep.addEventListener('animationend',()=>sweep.remove());
+  // 3. Topbar + filmstrip border flash
+  const tb=document.querySelector('.topbar'),fstrip=document.querySelector('.filmstrip');
+  tb.classList.add('bar-flash');fstrip.classList.add('bar-flash');
+  setTimeout(()=>{tb.classList.remove('bar-flash');fstrip.classList.remove('bar-flash')},600);
+  // 4. Background hue shift
+  const bgb=document.getElementById('bgBlur');
+  bgb.classList.add('hue-shift');
+  setTimeout(()=>bgb.classList.remove('hue-shift'),300);
+}
+
 // Glitch
 function triggerGlitch(){
   if(prefersReducedMotion)return;sfx.glitchSfx();
@@ -1013,21 +1057,44 @@ function setupThemeToggle(){
 // HUD Panel
 // ============================================================
 function renderHUD(w){
-  hudEl.innerHTML='';
-  const items=[];
-  if(w.side){items.push({label:'',val:w.side.toUpperCase(),cls:'hud__side-tag'})}
-  if(w.weapon){items.push({label:'',val:w.weapon,cls:''})}
-  if(w.kills!==null){items.push({label:'KILLS',val:w.kills+'K',cls:''})}
-  if(w.round){items.push({label:'',val:w.round,cls:''})}
-  if(w.mvp){items.push({label:'',val:'★ MVP',cls:'hud__mvp'})}
-  items.forEach((item,idx)=>{
-    const el=document.createElement('div');
-    el.className='hud__item'+(item.cls?' '+item.cls:'');
-    el.style.animationDelay=(idx*80+100)+'ms';
-    if(item.label)el.innerHTML=`<span>${item.label}</span> <span class="hud__val">${item.val}</span>`;
-    else el.innerHTML=`<span class="hud__val">${item.val}</span>`;
-    hudEl.appendChild(el);
-  });
+  hudEl.innerHTML='';hudEl.classList.remove('hud--tactical');
+  const has=w.side||w.weapon||(w.kills!==null)||w.round||w.mvp;
+  if(!has)return;
+  hudEl.classList.add('hud--tactical');
+  // Scan line
+  const scan=document.createElement('div');scan.className='hud__scan';hudEl.appendChild(scan);
+  let idx=0;
+  // Side — SVG stroke draw
+  if(w.side){
+    const el=document.createElement('div');el.className='hud__item';el.style.animationDelay=(idx*80+100)+'ms';
+    el.innerHTML=`<span class="hud__side-box"><svg viewBox="0 0 50 22" preserveAspectRatio="none"><rect x=".5" y=".5" width="49" height="21" rx="1"/></svg><span class="hud__val">${w.side.toUpperCase()}</span></span>`;
+    hudEl.appendChild(el);idx++;
+  }
+  // Weapon — typewriter reveal
+  if(w.weapon){
+    const el=document.createElement('div');el.className='hud__item';el.style.animationDelay=(idx*80+100)+'ms';
+    el.innerHTML=`<span class="hud__weapon-text">${w.weapon}</span>`;
+    hudEl.appendChild(el);idx++;
+  }
+  // Kills — digit roll
+  if(w.kills!==null){
+    const el=document.createElement('div');el.className='hud__item';el.style.animationDelay=(idx*80+100)+'ms';
+    const digs=w.kills.toString().split('').map((d,i)=>`<span class="hud__digit"><span style="animation-delay:${idx*80+250+i*120}ms">${d}</span></span>`).join('');
+    el.innerHTML=`<span>KILLS</span> <span class="hud__val">${digs}K</span>`;
+    hudEl.appendChild(el);idx++;
+  }
+  // Round
+  if(w.round){
+    const el=document.createElement('div');el.className='hud__item';el.style.animationDelay=(idx*80+100)+'ms';
+    el.innerHTML=`<span class="hud__val">${w.round}</span>`;
+    hudEl.appendChild(el);idx++;
+  }
+  // MVP — flare burst
+  if(w.mvp){
+    const el=document.createElement('div');el.className='hud__item';el.style.animationDelay=(idx*80+100)+'ms';
+    el.innerHTML=`<span class="hud__mvp-val">★ MVP<span class="hud__mvp-ring"></span></span>`;
+    hudEl.appendChild(el);idx++;
+  }
 }
 
 // ============================================================
